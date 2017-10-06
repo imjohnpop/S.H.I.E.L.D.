@@ -1,3 +1,11 @@
+<?php
+    require_once 'db_connect.php';
+    $db = db_connect();
+
+    $stmt = $db->prepare('SELECT * FROM shieldusers');
+    $stmt->execute();
+    $shieldusers = $stmt->fetchAll();  
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -20,18 +28,21 @@
 
     <section id="users" class="w-50 mx-auto container">
         <div class="row mt-3">
-            <div class="col-12 bg-white border border-dark py-4 px-5 m-3">
-                <p><b>coulson26 (level: 4)</b></p>
-                <p>I'm Agent Phil Coulson with the Strategic Homeland Intervention, Enforcement and Logistics Division. Tahiti is a magical place.</p>
-            </div>
-            <div class="col-12 bg-white border border-dark py-4 px-5 m-3">
-                <p><b>quake (level: 3)</b></p>
-                <p>The Avengers! Bring them to me or I will bring this entire building down on you!</p>
-            </div>
-            <div class="col-12 bg-white border border-dark py-4 px-5 m-3">
-                <p><b>nick_fury (level: 5)</b></p>
-                <p>How desperate am I? You threaten my world with war, you steal a force you can't hope to control, you talk about peace, and you kill 'cause it's fun. You have made me very desperate. You might not be glad that you did.</p>
-            </div>
+            <?php foreach ($shieldusers as $shielduser) : ?>
+                <div class="col-12 bg-white border border-dark py-4 px-5 m-3">
+                    <p class="w-50 d-flex justify-content-between">
+                        <span>
+                            <b><?= htmlspecialchars(stripslashes($shielduser['user']));?></b>
+                        </span>
+                        <span>
+                            <b>(level: <?= htmlspecialchars(stripslashes($shielduser['level']));?> )</b>
+                        </span>
+                    </p>
+                    <p>
+                        <?= htmlspecialchars(stripslashes($shielduser['text']));?>
+                    </p>
+                </div>
+            <?php endforeach; ?>
         </div>
     </section>
     
