@@ -1,20 +1,17 @@
 <?php
     require_once 'db_connect.php';
     require_once 'required.php';
-    require_once 'uncorrect.php';
 
-    // SHORTER MUCH EFFICIENT VERSION
-    if ($_POST) {
+    if($_POST) {
         $db = db_connect();
-        $stmt = $db->prepare('SELECT * FROM `users` WHERE `username` = ?');
-        $stmt->execute([$_POST['username']]);
-        $user = $stmt->fetch();
-        if (password_verify($_POST['passwd'], $user['passwd'])) {
-            header('Location: list.php');
-            exit();
-        }
+        $stmt = $db->prepare(
+            'INSERT INTO `users` (`username`, `passwd`) VALUES (?, ?)'
+        );
+        $hash = password_hash($_POST['passwd'], PASSWORD_DEFAULT);
+        $stmt->execute([$_POST['username'], $hash]);
+        header('Location: index.php?username=' . $_POST['username']);
+        die();
     }
-
 ?>
 
 <!DOCTYPE html>
@@ -39,23 +36,17 @@
 <body class="bg-light d-flex flex-column justify-content-between">
     <?php include 'navbar.php'; ?>
 
-    <section id="loginwindow" class="w-25 mx-auto bg-dark container rounded d-flex flex-column align-items-center">
+    <section id="signupwindow" class="w-25 mx-auto bg-dark container rounded d-flex flex-column align-items-center">
         <div class="w-75 mt-2 text-light">
-            <h1>Sign In</h1>
-            <form action="index.php" method="post">
-                <div class="form-group d-flex justify-content-between"><label class="mt-2" for="username">Username:</label><input class="w-50 form-control" type="text" name="username"
-                 value="<?php if ($_POST) {if(strlen($_POST['username'])!=0){echo $_POST['username'];}}
-                 elseif ($_GET) {if (strlen($_GET['username'])!=0){echo $_GET['username'];}}
-                 ?>" autofocus></div>
+            <h1>Register</h1>
+            <form action="signup.php" method="post">
+                <div class="form-group d-flex justify-content-between"><label class="mt-2" for="username">Username:</label><input class="w-50 form-control" type="text" name="username" autofocus></div>
                 <div class="form-group d-flex justify-content-between"><label class="mt-2" for="username">Password:</label><input class="w-50 form-control" type="password" name="passwd"></div>
-                <input class="btn btn-dark border border-light form-control mb-2" type="submit" value="Sign In">
-                <a class="btn btn-dark border border-light w-100 mb-4" href="signup.php">Sign Up</a>
+                <input class="btn btn-dark border border-light form-control mb-4" type="submit" value="Sign Up">
             </form>
-            <?php if ($_GET) {echo '<p class="text-center">Thanks for sign up!</p>';} ?>
         </div>
     </section>
     <?php required(); ?>
-    <?php uncorrect(); ?>
 
     <section id="footer" class="bg-dark container-fluid d-flex justify-content-center align-items-center">
         <p class="text-white">#created<b>By</b>Jan</p>
